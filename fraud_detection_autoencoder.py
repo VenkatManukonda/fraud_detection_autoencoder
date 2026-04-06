@@ -8,29 +8,28 @@ from pyod.models.auto_encoder import AutoEncoder
 
 
 # -------------------------------
-# Step 1: Load Dataset
+# LOAD DATA (MUST BE FIRST)
 # -------------------------------
 data = pd.read_csv("creditcard.csv")
-
 print("Dataset shape:", data.shape)
 
 
 # -------------------------------
-# Step 2: Split Features & Labels
+# FEATURES + LABEL
 # -------------------------------
 X = data.drop(["Time", "Class"], axis=1)
 y = data["Class"]
 
 
 # -------------------------------
-# Step 3: Normalize Data
+# NORMALIZE
 # -------------------------------
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 
 # -------------------------------
-# Step 4: Train-Test Split
+# TRAIN TEST SPLIT
 # -------------------------------
 X_train, X_test, y_train, y_test = train_test_split(
     X_scaled,
@@ -41,28 +40,25 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 
 # -------------------------------
-# Step 5: Build AutoEncoder Model
+# AUTOENCODER MODEL
 # -------------------------------
-model = AutoEncoder(
-    contamination=0.01,
-    verbose=1
-)
+model = AutoEncoder(contamination=0.01, verbose=1)
 
 
 # -------------------------------
-# Step 6: Train Model
+# TRAIN
 # -------------------------------
 model.fit(X_train)
 
 
 # -------------------------------
-# Step 7: Predict Anomalies
+# PREDICT
 # -------------------------------
-y_pred = model.predict(X_test)  # 0 = normal, 1 = fraud/anomaly
+y_pred = model.predict(X_test)
 
 
 # -------------------------------
-# Step 8: Results
+# RESULTS
 # -------------------------------
 print("\nResults:")
 print("Actual Fraud Cases:", np.sum(y_test))
@@ -70,9 +66,7 @@ print("Detected Fraud Cases:", np.sum(y_pred))
 
 
 # -------------------------------
-# Step 9: Reconstruction Error
+# RECONSTRUCTION ERROR
 # -------------------------------
 scores = model.decision_function(X_test)
-
-print("\nSample Reconstruction Errors:")
-print(scores[:10])
+print("\nSample Reconstruction Errors:", scores[:10])
