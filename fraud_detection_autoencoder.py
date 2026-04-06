@@ -1,35 +1,34 @@
 import pandas as pd
 import numpy as np
 
+from pyod.models.auto_encoder import AutoEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-from pyod.models.auto_encoder import AutoEncoder
-
 
 # -------------------------------
-# LOAD DATA (MUST BE FIRST)
+# STEP 1: LOAD DATA (MISSING IN YOUR FILE)
 # -------------------------------
 data = pd.read_csv("creditcard.csv")
 print("Dataset shape:", data.shape)
 
 
 # -------------------------------
-# FEATURES + LABEL
+# STEP 2: SPLIT FEATURES & LABEL
 # -------------------------------
 X = data.drop(["Time", "Class"], axis=1)
 y = data["Class"]
 
 
 # -------------------------------
-# NORMALIZE
+# STEP 3: SCALE DATA
 # -------------------------------
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 
 # -------------------------------
-# TRAIN TEST SPLIT
+# STEP 4: TRAIN / TEST SPLIT
 # -------------------------------
 X_train, X_test, y_train, y_test = train_test_split(
     X_scaled,
@@ -40,25 +39,25 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 
 # -------------------------------
-# AUTOENCODER MODEL
+# STEP 5: AUTOENCODER MODEL
 # -------------------------------
 model = AutoEncoder(contamination=0.01, verbose=1)
 
 
 # -------------------------------
-# TRAIN
+# STEP 6: TRAIN MODEL
 # -------------------------------
 model.fit(X_train)
 
 
 # -------------------------------
-# PREDICT
+# STEP 7: PREDICTION
 # -------------------------------
 y_pred = model.predict(X_test)
 
 
 # -------------------------------
-# RESULTS
+# STEP 8: RESULTS
 # -------------------------------
 print("\nResults:")
 print("Actual Fraud Cases:", np.sum(y_test))
@@ -66,7 +65,7 @@ print("Detected Fraud Cases:", np.sum(y_pred))
 
 
 # -------------------------------
-# RECONSTRUCTION ERROR
+# STEP 9: RECONSTRUCTION ERROR
 # -------------------------------
 scores = model.decision_function(X_test)
 print("\nSample Reconstruction Errors:", scores[:10])
