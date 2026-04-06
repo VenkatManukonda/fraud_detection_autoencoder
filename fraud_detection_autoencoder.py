@@ -1,35 +1,78 @@
-from pyod.models.auto_encoder import AutoEncoder
+import pandas as pd
+import numpy as np
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-# Preprocessing
+from pyod.models.auto_encoder import AutoEncoder
+
+
+# -------------------------------
+# Step 1: Load Dataset
+# -------------------------------
+data = pd.read_csv("creditcard.csv")
+
+print("Dataset shape:", data.shape)
+
+
+# -------------------------------
+# Step 2: Split Features & Labels
+# -------------------------------
 X = data.drop(["Time", "Class"], axis=1)
 y = data["Class"]
 
+
+# -------------------------------
+# Step 3: Normalize Data
+# -------------------------------
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
+
+# -------------------------------
+# Step 4: Train-Test Split
+# -------------------------------
 X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.2, random_state=42
+    X_scaled,
+    y,
+    test_size=0.2,
+    random_state=42
 )
 
-# Initialize AutoEncoder using current PyOD API
-model = AutoEncoder(contamination=0.01, verbose=1)
 
-# Fit the model
+# -------------------------------
+# Step 5: Build AutoEncoder Model
+# -------------------------------
+model = AutoEncoder(
+    contamination=0.01,
+    verbose=1
+)
+
+
+# -------------------------------
+# Step 6: Train Model
+# -------------------------------
 model.fit(X_train)
 
-# Predictions: 0 = normal, 1 = anomaly
-y_pred = model.predict(X_test)
 
-# Evaluate results
-fraud_detected = y_pred.sum()
-actual_fraud = y_test.sum()
+# -------------------------------
+# Step 7: Predict Anomalies
+# -------------------------------
+y_pred = model.predict(X_test)  # 0 = normal, 1 = fraud/anomaly
 
+
+# -------------------------------
+# Step 8: Results
+# -------------------------------
 print("\nResults:")
-print("Actual Fraud Cases:", actual_fraud)
-print("Detected Fraud Cases:", fraud_detected)
+print("Actual Fraud Cases:", np.sum(y_test))
+print("Detected Fraud Cases:", np.sum(y_pred))
 
-# Reconstruction error (optional)
-reconstruction_error = model.decision_function(X_test)
-print("\nSample Reconstruction Errors:", reconstruction_error[:10])
+
+# -------------------------------
+# Step 9: Reconstruction Error
+# -------------------------------
+scores = model.decision_function(X_test)
+
+print("\nSample Reconstruction Errors:")
+print(scores[:10])
