@@ -47,10 +47,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 # Step 4: Train AutoEncoder Model
 # -------------------------------
 model = AutoEncoder(
-    hidden_neurons=[32, 16, 16, 32],
     epochs=20,
     batch_size=32,
-    contamination=0.01,  # Expected fraud percentage
+    contamination=0.01,
     verbose=1
 )
 
